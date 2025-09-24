@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ config.name }} - Configuration{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item active">{{ config.name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="bi bi-file-text"></i> {{ config.name }}
+                </h2>
+                <div>
+                    <a href="{% url 'test_form' config.id %}" class="btn btn-success">
+                        <i class="bi bi-play"></i> Test Form
+                    </a>
+                    <a href="{% url 'schema_api' config.id %}" class="btn btn-outline-info" target="_blank">
+                        <i class="bi bi-code"></i> API
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Configuration Details</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Code:</strong></td>
+                                <td>{{ config.code }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Organization:</strong></td>
+                                <td>{{ config.organization.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Layout Style:</strong></td>
+                                <td>{{ config.get_layout_style_display }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>
+                                    {% if config.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Created:</strong></td>
+                                <td>{{ config.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                        </table>
+                        
+                        {% if config.description %}
+                        <h6>Description</h6>
+                        <p class="text-muted">{{ config.description }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>User-Defined Fields</h5>
+                        {% if udfs %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Scope</th>
+                                        <th>Required</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for udf in udfs %}
+                                    <tr>
+                                        <td>{{ udf.display_name }}</td>
+                                        <td>
+                                            <span class="badge bg-info">{{ udf.get_field_type_display }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ udf.get_scope_display }}</span>
+                                        </td>
+                                        <td>
+                                            {% if udf.is_required %}
+                                                <i class="bi bi-check-circle text-success"></i>
+                                            {% else %}
+                                                <i class="bi bi-dash-circle text-muted"></i>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No user-defined fields configured.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-code-square"></i> Generated Schema</h3>
+                <p class="mb-0 text-muted">This is the merged schema that would be used to generate dynamic forms</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Header Fields</h5>
+                        {% if schema.header %}
+                        {% for field_name, field_config in schema.header.items %}
+                        <div class="field-demo">
+                            <strong>{{ field_config.label|default:field_name }}</strong>
+                            <span class="badge bg-primary">{{ field_config.type }}</span>
+                            {% if field_config.required %}
+                            <span class="badge bg-danger">Required</span>
+                            {% endif %}
+                            {% if field_name|slice:":4" == "udf_" %}
+                            <span class="badge bg-warning">UDF</span>
+                            {% endif %}
+                            {% if field_config.help_text %}
+                            <br><small class="text-muted">{{ field_config.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-muted">No header fields defined.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>Line Fields</h5>
+                        {% if schema.lines %}
+                        {% for field_name, field_config in schema.lines.items %}
+                        <div class="field-demo">
+                            <strong>{{ field_config.label|default:field_name }}</strong>
+                            <span class="badge bg-primary">{{ field_config.type }}</span>
+                            {% if field_config.required %}
+                            <span class="badge bg-danger">Required</span>
+                            {% endif %}
+                            {% if field_name|slice:":4" == "udf_" %}
+                            <span class="badge bg-warning">UDF</span>
+                            {% endif %}
+                            {% if field_config.help_text %}
+                            <br><small class="text-muted">{{ field_config.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-muted">No line fields defined.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-file-code"></i> Raw Schema JSON</h3>
+            </div>
+            <div class="card-body">
+                <pre class="schema-json">{{ schema_json }}</pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

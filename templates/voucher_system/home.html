@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}ERP System - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+            <h1 class="display-4">
+                <i class="bi bi-gear-fill"></i> Dynamic Voucher Entry System
+            </h1>
+            <p class="lead">
+                A scalable ERP system with dynamic form generation, user-defined fields, and flexible voucher configurations.
+            </p>
+            <p>
+                This system demonstrates enterprise-level form configuration capabilities similar to SAP or Microsoft Dynamics NAV.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h2><i class="bi bi-list-ul"></i> Available Voucher Configurations</h2>
+        <p class="text-muted">Each configuration defines a different type of voucher with its own form fields and validation rules.</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for config in configs %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-file-text"></i> {{ config.name }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>Code:</strong> {{ config.code }}<br>
+                    <strong>Organization:</strong> {{ config.organization.name }}<br>
+                    <strong>Layout:</strong> {{ config.get_layout_style_display }}<br>
+                </p>
+                {% if config.description %}
+                <p class="card-text text-muted">{{ config.description }}</p>
+                {% endif %}
+                
+                <div class="mt-3">
+                    <span class="badge bg-info">
+                        <i class="bi bi-plus-square"></i> 
+                        {{ config.udf_configs.count }} UDF{{ config.udf_configs.count|pluralize }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="btn-group w-100" role="group">
+                    <a href="{% url 'config_detail' config.id %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-eye"></i> View Schema
+                    </a>
+                    <a href="{% url 'test_form' config.id %}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-play"></i> Test Form
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i>
+            No voucher configurations found. 
+            <a href="/admin/voucher_system/vouchermodeconfig/add/" class="alert-link">Create one in the admin</a>.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-info-circle"></i> System Features</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-gear"></i> Dynamic Configuration</h5>
+                        <ul>
+                            <li>JSON/YAML schema-driven forms</li>
+                            <li>Runtime field addition/modification</li>
+                            <li>Multiple layout styles</li>
+                            <li>Validation rule configuration</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-plus-square"></i> User-Defined Fields</h5>
+                        <ul>
+                            <li>Add fields without code changes</li>
+                            <li>Multiple field types supported</li>
+                            <li>Conditional field visibility</li>
+                            <li>Custom validation patterns</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-building"></i> Multi-Tenant</h5>
+                        <ul>
+                            <li>Organization-based separation</li>
+                            <li>Isolated configurations</li>
+                            <li>Per-organization customization</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-check-circle"></i> Enterprise Features</h5>
+                        <ul>
+                            <li>Audit trails</li>
+                            <li>Business rule validation</li>
+                            <li>Extensible architecture</li>
+                            <li>API endpoints</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
